@@ -1,8 +1,12 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist/client",
-  "framework": "vite",
-  "env": {
-    "NODE_ENV": "production"
-  }
+  "buildCommand": "echo 'Static HTML'",
+  "outputDirectory": ".",
+  "cleanUrls": false,
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
