@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streamflix Pro - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ed8936;
+            --info: #4299e1;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --gray: #cbd5e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: white;
+        }
+
+        .user-menu {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Buttons */
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #a0aec0;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        thead {
+            background: var(--light);
+            border-bottom: 2px solid var(--gray);
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(237, 137, 54, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--danger);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background: rgba(72, 187, 120, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(245, 101, 101, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        .success-message {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">🎬 Streamflix Pro</div>
+            <div class="nav">
+                <button class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</button>
+                <button class="nav-item" onclick="showPage('analytics')">📈 Analytics</button>
+                <button class="nav-item" onclick="showPage('movies')">🎬 Filmes</button>
+                <button class="nav-item" onclick="showPage('ads')">💰 Anúncios</button>
+                <button class="nav-item" onclick="showPage('notifications')">🔔 Notificações</button>
+                <button class="nav-item" onclick="showPage('settings')">⚙️ Configurações</button>
+                <button class="nav-item" onclick="showPage('users')">👥 Usuários</button>
+                <button class="nav-item" onclick="showPage('monetization')">💵 Monetização</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <div class="header">
+                <h1>🎬 Streamflix Pro Admin</h1>
+                <div class="user-menu" onclick="logout()">👤 Sair</div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title">Total de Cliques</div>
+                        <div class="card-value" id="dashTotal">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">👁️</div>
+                        <div class="card-title">Hoje</div>
+                        <div class="card-value" id="dashToday">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">👥</div>
+                        <div class="card-title">Usuários</div>
+                        <div class="card-value" id="dashUsers">0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💰</div>
+                        <div class="card-title">Receita (est.)</div>
+                        <div class="card-value" id="dashRevenue">R$ 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Page -->
+            <div id="analytics" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">📈 Estatísticas Detalhadas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Valor</th>
+                                <th>Mudança</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Visualizações Total</td>
+                                <td id="analTotal">0</td>
+                                <td><span class="badge badge-success">+15%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Usuários Ativos</td>
+                                <td id="analUsers">0</td>
+                                <td><span class="badge badge-success">+8%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Taxa de Cliques</td>
+                                <td id="analCTR">0%</td>
+                                <td><span class="badge badge-warning">-3%</span></td>
+                            </tr>
+                            <tr>
+                                <td>Tempo Médio de Sessão</td>
+                                <td>12m 34s</td>
+                                <td><span class="badge badge-success">+5%</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Movies Page -->
+            <div id="movies" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">🎬 Gerenciar Filmes</h2>
+                    <button class="btn-primary" onclick="openMovieModal()" style="margin-bottom: 20px;">+ Adicionar Filme</button>
+                    
+                    <div class="form-group">
+                        <label>🔍 Buscar Filmes:</label>
+                        <input type="text" placeholder="Digite o nome do filme..." id="movieSearch">
+                    </div>
+
+                    <div class="form-group">
+                        <label>API de Filmes:</label>
+                        <select id="movieApi">
+                            <option value="tmdb">TMDb (The Movie Database)</option>
+                            <option value="omdb">OMDb</option>
+                            <option value="imdb">IMDb</option>
+                        </select>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Filme</th>
+                                <th>Ano</th>
+                                <th>Avaliação</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="moviesTable">
+                            <tr>
+                                <td>Carregando filmes...</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ads Page -->
+            <div id="ads" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">💰 Gerenciar Anúncios</h2>
+                    <button class="btn-primary" onclick="openAdModal()" style="margin-bottom: 20px;">+ Criar Anúncio</button>
+
+                    <div class="form-group">
+                        <label>Tipo de Anúncio:</label>
+                        <select id="adType">
+                            <option value="banner">Banner</option>
+                            <option value="video">Vídeo</option>
+                            <option value="intersticial">Intersticial</option>
+                            <option value="native">Nativo</option>
+                        </select>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Anúncio</th>
+                                <th>Tipo</th>
+                                <th>Impressões</th>
+                                <th>Cliques</th>
+                                <th>CTR</th>
+                                <th>Receita</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adsTable">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 20px; color: #999;">
+                                    Nenhum anúncio criado ainda
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notifications Page -->
+            <div id="notifications" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">🔔 Gerenciar Notificações</h2>
+                    <button class="btn-primary" onclick="openNotificationModal()" style="margin-bottom: 20px;">+ Nova Notificação</button>
+
+                    <div class="form-group">
+                        <label>Titulo:</label>
+                        <input type="text" id="notifTitle" placeholder="Título da notificação">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mensagem:</label>
+                        <textarea id="notifMessage" placeholder="Digite a mensagem..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo:</label>
+                        <select id="notifType">
+                            <option value="info">ℹ️ Informação</option>
+                            <option value="warning">⚠️ Aviso</option>
+                            <option value="success">✅ Sucesso</option>
+                            <option value="error">❌ Erro</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" onclick="sendNotification()">Enviar Notificação</button>
+
+                    <table style="margin-top: 30px;">
+                        <thead>
+                            <tr>
+                                <th>Notificação</th>
+                                <th>Tipo</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notificationsTable">
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                                    Nenhuma notificação enviada
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">⚙️ Configurações</h2>
+
+                    <h3 style="margin: 20px 0 15px;">🌐 Idioma e Localização</h3>
+                    <div class="form-group">
+                        <label>Idioma Padrão:</label>
+                        <select id="language">
+                            <option value="pt-BR">🇧🇷 Português (Brasil)</option>
+                            <option value="en-US">🇺🇸 English (USA)</option>
+                            <option value="es-ES">🇪🇸 Español (España)</option>
+                        </select>
+                    </div>
+
+                    <h3 style="margin: 20px 0 15px;">🎬 Configurações de Filmes</h3>
+                    <div class="form-group">
+                        <label>API Key TMDB:</label>
+                        <input type="password" id="tmdbKey" placeholder="Insira sua chave TMDB">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Qualidade Padrão:</label>
+                        <select id="videoQuality">
+                            <option value="1080p">1080p (HD)</option>
+                            <option value="720p">720p (HD)</option>
+                            <option value="480p">480p (SD)</option>
+                            <option value="360p">360p (SD)</option>
+                        </select>
+                    </div>
+
+                    <h3 style="margin: 20px 0 15px;">💰 Monetização</h3>
+                    <div class="form-group">
+                        <label>Rede de Anúncios:</label>
+                        <select id="adNetwork">
+                            <option value="google">Google AdMob</option>
+                            <option value="facebook">Facebook Audience Network</option>
+                            <option value="unity">Unity Ads</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Frequência de Anúncios:</label>
+                        <select id="adFrequency">
+                            <option value="every5">A cada 5 minutos</option>
+                            <option value="every10">A cada 10 minutos</option>
+                            <option value="every15">A cada 15 minutos</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary" onclick="saveSettings()">💾 Salvar Configurações</button>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="users" class="page">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">👥 Gerenciar Usuários</h2>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Tipo</th>
+                                <th>Data Cadastro</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 20px; color: #999;">
+                                    Nenhum usuário registrado
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Monetization Page -->
+            <div id="monetization" class="page">
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-icon">💵</div>
+                        <div class="card-title">Receita Este Mês</div>
+                        <div class="card-value">R$ 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title">CPM Médio</div>
+                        <div class="card-value">R$ 0</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">👁️</div>
+                        <div class="card-title">Impressões</div>
+                        <div class="card-value">0</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">💰 Relatório de Receitas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Impressões</th>
+                                <th>Cliques</th>
+                                <th>CTR</th>
+                                <th>Receita</th>
+                            </tr>
+                        </thead>
+                        <tbody id="revenueTable">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 20px; color: #999;">
+                                    Nenhum dado disponível
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" id="successMsg"></div>
+
+    <!-- Modals -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <div class="modal-header">Adicionar Novo Filme</div>
+            <div class="form-group">
+                <label>Nome do Filme:</label>
+                <input type="text" id="movieName" placeholder="Nome do filme">
+            </div>
+            <div class="form-group">
+                <label>Ano:</label>
+                <input type="number" id="movieYear" placeholder="2024">
+            </div>
+            <div class="form-group">
+                <label>Descrição:</label>
+                <textarea id="movieDesc" placeholder="Descrição do filme..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Gênero:</label>
+                <select id="movieGenre">
+                    <option value="acao">Ação</option>
+                    <option value="comedia">Comédia</option>
+                    <option value="drama">Drama</option>
+                    <option value="suspense">Suspense</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeMovieModal()">Cancelar</button>
+                <button class="btn-primary" onclick="addMovie()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize data from localStorage
+        function loadData() {
+            const clicks = JSON.parse(localStorage.getItem('streamflix_clicks') || '[]');
+            const today = new Date().toDateString();
+            const todayClicks = clicks.filter(c => new Date(c.timestamp).toDateString() === today);
+            
+            document.getElementById('dashTotal').textContent = clicks.length;
+            document.getElementById('dashToday').textContent = todayClicks.length;
+            document.getElementById('dashUsers').textContent = new Set(clicks.map(c => c.userAgent)).size;
+            document.getElementById('dashRevenue').textContent = 'R$ ' + (clicks.length * 0.15).toFixed(2);
+            
+            document.getElementById('analTotal').textContent = clicks.length;
+            document.getElementById('analUsers').textContent = new Set(clicks.map(c => c.userAgent)).size;
+            document.getElementById('analCTR').textContent = clicks.length > 0 ? '45%' : '0%';
+        }
+
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function openMovieModal() {
+            document.getElementById('movieModal').classList.add('active');
+        }
+
+        function closeMovieModal() {
+            document.getElementById('movieModal').classList.remove('active');
+        }
+
+        function addMovie() {
+            const name = document.getElementById('movieName').value;
+            if (name) {
+                showMessage('Filme adicionado com sucesso!');
+                closeMovieModal();
+                loadData();
+            }
+        }
+
+        function saveSettings() {
+            showMessage('Configurações salvas com sucesso!');
+        }
+
+        function sendNotification() {
+            showMessage('Notificação enviada com sucesso!');
+        }
+
+        function showMessage(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function logout() {
+            if (confirm('Deseja sair?')) {
+                alert('Desconectado!');
+            }
+        }
+
+        // Load data on start
+        loadData();
+        setInterval(loadData, 5000);
+    </script>
+</body>
+</html>
